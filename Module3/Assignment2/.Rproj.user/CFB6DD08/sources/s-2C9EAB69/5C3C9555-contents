@@ -1,0 +1,274 @@
+---
+title: "Assignment3.rmd"
+author: "Jordan Whitaker"
+date: "5/25/2020"
+output: word_document
+---
+
+```{r}
+library(tidyverse)
+library(MASS)
+library(caret)
+library(ROCR)
+```
+
+```{r}
+parole = read_csv("parole.csv")
+
+head(parole)
+
+
+
+parole = parole %>% mutate(male = as_factor(as.character(male))) %>%
+mutate(male = fct_recode(male,
+"male" = "1",
+"female" = "0"))
+
+parole = parole %>% mutate(race = as_factor(as.character(race))) %>%
+mutate(race = fct_recode(race,
+"white" = "1",
+"other" = "2"))
+
+parole = parole %>% mutate(state = as_factor(as.character(state))) %>%
+mutate(state = fct_recode(state,
+"Other" = "1",
+"Kentucky" = "2",
+"Lousiana" = "3",
+"Virginia" = "4"))
+
+
+parole = parole %>% mutate(crime = as_factor(as.character(crime))) %>%
+mutate(crime = fct_recode(crime,
+"Other" = "1",
+"larceny" = "2",
+"drug-related" = "3",
+"driving-related" = "4"))
+
+parole = parole %>% mutate(violator = as_factor(as.character(violator))) %>%
+mutate(violator = fct_recode(violator,
+"no-violation" = "0",
+"violated-parole" = "1"))
+
+head(parole)
+```
+
+
+
+```{r}
+
+set.seed(12345)
+train.rows = createDataPartition(y= parole$violator, p=0.7, list= FALSE)
+
+train = parole[train.rows,]
+test = parole[-train.rows,]
+
+```
+
+
+Task 2: My thoughts were to put eyes on most of the variables since there are only 9.  Most do not seem to be overwhelmingly indicative of a parole violation other than male. Relative to the other visualizations, if a parole is male, I am going to hypothesize that they will have a higher rate of violating their parole. 
+
+```{r}
+
+ggplot(parole, aes(x=time.served)) + geom_histogram()
+
+ggplot(train, aes(x=violator, y=time.served)) + geom_boxplot()
+
+ggplot(train, aes(x=violator, y=age)) + geom_boxplot()
+
+ggplot(train, aes(x=violator, fill=race)) + geom_bar()
+
+t2 = table(train$violator, train$race)
+prop.table(t2, margin=2)
+
+ggplot(train, aes(x=violator, fill= crime)) + geom_bar()
+
+ggplot(train, aes(x=violator, fill= male)) + geom_bar()
+
+t = table(train$violator, train$state)
+prop.table(t, margin=2)
+
+
+```
+
+
+The variable I chose is not significant :(  Has an AIC of 143.89 ... lets see how low it can go
+```{r}
+
+test_mod = glm(violator ~ male, test, family ="binomial")
+summary(test_mod)
+
+```
+
+
+
+Making the best model... I think I can I think I can....
+
+```{r}
+allmod = glm(violator ~., train, family ="binomial")
+summary(allmod) #aic of 268.09
+
+emptymod = glm(violator~1, train, family="binomial")
+summary(emptymod) #aic of 342.04
+
+
+
+```
+
+
+Forward stepwise
+```{r}
+forwardmod = stepAIC(emptymod, direction = "forward", scope=list(upper=allmod, lower=emptymod), trace = TRUE)
+summary(forwardmod) # AIC: 258.98
+
+
+```
+
+```{r}
+backwardmod = stepAIC(allmod, direction = "backward", trace = TRUE)
+summary(backwardmod) # AIC: 258.98
+
+
+```
+
+Custom Mod. Why not?
+After a lot of variations.. I ended up with a 260.33 AIC with my custom model.  The forward/backward stepwise is the best model.
+
+The forward/backward model identifies raceother, stateVirginia, and multiple.offenses as the most significant variables in the model.  The AIC ends up being 258.98.
+```{r}
+
+custom_mod = glm(formula = violator ~ time.served + multiple.offenses + state + race, family = "binomial", 
+    data = train)
+
+summary(custom_mod)
+```
+
+```{r}
+
+parolee1 = data.frame(state = "Lousiana", multiple.offenses = 1, race = "white" )
+predict(forwardmod, parolee1, type="response")
+
+```
+The predicted probability for a parole violation for parolee1 is .34
+
+```{r}
+
+parolee2 = data.frame(state = "Kentucky", multiple.offenses = 0, race = "other" )
+predict(forwardmod, parolee2, type="response")
+
+
+
+```
+The predicted probability for a parole violation for parolee2 is .21
+
+
+```{r}
+
+predictions = predict(forwardmod, type="response")
+head(predictions)
+
+```
+
+Threshold select/ ROC curve
+```{r}
+ROCRpred = prediction(predictions, train$violator)
+
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+
+
+plot(ROCRperf, colorize= TRUE, print.cutoffs.at=seq(0,1,by=0.1), text.adj=c(-0.2,1.7))
+
+
+```
+
+```{r}
+opt.cut = function(perf,pred){
+  cut.ind = mapply(FUN=function(x,y,p){
+    d = (x -0)^2 + (y-1)^2
+    ind = which(d == min(d))
+    c(sensitivity = y[[ind]], specificity = 1-x[[ind]],
+      cutoff = p[[ind]])
+  }, perf@x.values, perf@y.values, pred@cutoffs)
+}
+
+print(opt.cut(ROCRperf, ROCRpred))
+
+```
+
+```{r}
+t1 = table(train$violator, predictions > 0.2069629)
+t1
+```
+```{r}
+(t1[1,1]+t1[2,2]/nrow(train)) # this didn't work? so i had to do a manual calculation as you can see below
+
+train_accuracy = function(){
+  x = t1[1,1]
+  y = t1[2,2]
+  top = x +y
+  bottom = nrow(train)
+  accuracy = top/bottom
+  print(accuracy)
+}
+
+train_accuracy()
+
+```
+Task 8:  Based on the above analysis, the sensitivity, specificity, and accuracy are: 
+sensitivity: 0.7272727
+specificity: 0.8588517
+accuracy:    0.8435518
+
+Incorrectly classifying someone as a potential parole violator puts them at risk of being jailed/imprisoned for longer than they should be. These people have hopefully been fully rehabilitated and are working towards becoming better versions of themselves.
+
+
+
+```{r}
+t1 = table(train$violator, predictions > 0.1)
+t1
+
+
+train_accuracy()
+
+
+```
+Task 9: Thresholds of 0.5 and 0.35 have an accuracy of .896 where as a threshold of 0.1 has an accuracy of .825
+
+
+```{r}
+naive_accuracy = function(){
+  x = t1[1]
+  top = x
+  bottom = nrow(train)
+  accuracy = top/bottom
+  print(accuracy)
+}
+
+t1 = table(train$violator, predictions > 1)
+t1
+
+naive_accuracy()
+```
+
+naive has an accuracy of .88
+
+
+Task 10:
+I am choosing the threshold of 0.35.  The accuracy when applied to the testing data is .90
+```{r}
+test_accuracy = function(){
+  x = t1_test[1,1]
+  y = t1_test[2,2]
+  top = x +y
+  bottom = nrow(test)
+  accuracy = top/bottom
+  print(accuracy)
+}
+predict_test = predict(forwardmod, newdata = test, type= "response")
+
+t1_test = table(test$violator, predict_test > 0.35)
+test_accuracy()
+
+
+```
+
+

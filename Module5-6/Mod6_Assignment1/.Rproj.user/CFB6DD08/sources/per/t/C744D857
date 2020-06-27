@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592746265087.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C744D857",
+    "lastKnownWriteTime" : 8028074750225051768,
+    "last_content_update" : 1592746265087,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "36F40232",
+        "caption" : "trucks2",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=trucks2&cache_key=36F40232",
+        "displayedObservations" : 4000,
+        "environment" : "",
+        "expression" : "trucks2",
+        "object" : "trucks2",
+        "preview" : 0,
+        "totalObservations" : 4000,
+        "variables" : 2
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

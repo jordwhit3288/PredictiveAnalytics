@@ -1,0 +1,352 @@
+---
+title: "Assignment1"
+author: "Jordan Whitaker"
+date: "6/20/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+#install.packages(c("tidyverse", "caret", "nnet", "rpart", "ranger", "caretEnsemble", "xgboost"))
+
+library("tidyverse")
+library("caret")
+library("nnet")
+library("rpart")
+library("ranger")
+library("caretEnsemble")
+library("xgboost")
+```
+
+```{r}
+fin = read_csv("2018Fin.csv")
+
+#str(fin)
+#summary(fin)
+
+
+```
+
+
+```{r}
+
+fin = fin %>% select('Class',
+`Revenue Growth`, `EPS Diluted`, `EBITDA Margin`, 'priceBookValueRatio', 'debtEquityRatio', 'debtRatio', `PE ratio`, 'Sector', `5Y Revenue Growth (per Share)`, 'returnOnAssets', 'returnOnEquity', 'returnOnCapitalEmployed',
+'quickRatio')
+
+```
+
+
+
+```{r}
+
+fin$Sector = as.factor(fin$Sector)
+
+fin$Class = as.factor(fin$Class)
+
+fin$Class = (case_when(fin$Class == '0' ~ 'No',
+                      fin$Class == '1' ~ 'Yes'))
+
+fin$Class = as.factor(fin$Class)
+
+```
+
+
+```{r}
+
+fin = drop_na(fin)
+
+
+fin = fin %>% filter(`Revenue Growth` <= 1)
+fin = fin %>% filter(`EPS Diluted` >= -10, `EPS Diluted` <= 10)
+fin = fin %>% filter(`EBITDA Margin` >= -5, `EBITDA Margin` <= 5)
+fin = fin %>% filter(priceBookValueRatio >= 0, priceBookValueRatio <= 5)
+fin = fin %>% filter(debtEquityRatio >= -1, debtEquityRatio <= 2)
+fin = fin %>% filter(debtRatio <= 1)
+fin = fin %>% filter(`PE ratio` <= 100)
+fin = fin %>% filter(returnOnAssets >= -5, returnOnAssets <= 5)
+fin = fin %>% filter(returnOnEquity >= -5, returnOnEquity <= 5)
+fin = fin %>% filter(returnOnCapitalEmployed >= -2, returnOnCapitalEmployed <= 2)
+fin = fin %>% filter(quickRatio <= 20)
+
+
+```
+
+
+```{r}
+#summary(fin)
+
+```
+
+
+
+```{r}
+set.seed(12345)
+train.rows = createDataPartition(y = fin$Class, p=0.7, list = FALSE)
+train = dplyr::slice(fin, train.rows)
+test = dplyr::slice(fin, -train.rows)
+
+
+```
+
+```{r}
+fitControl = trainControl(method = "cv",
+                          number = 10)
+nnetGrid = expand.grid(size = 1:19,
+                       decay = c(0.5, 0.1, 1e-2, 1e-3, 1e-4, 1e-5,1e-6, 1e-7))
+
+set.seed(1234)
+nnetFit = train(x=fin[,-1], y=fin$Class,
+                method = "nnet",
+                trControl = fitControl,
+                tuneGrid = nnetGrid,
+                verbose = FALSE,
+                trace = FALSE)
+
+
+```
+
+```{r}
+
+saveRDS(nnetFit, "neural_net.rds")
+rm(nnetFit)
+
+nnetFit = readRDS("neural_net.rds")
+
+
+
+```
+
+
+```{r}
+plot(nnetFit)
+
+```
+
+
+
+
+```{r}
+nnetFit
+```
+
+```{r}
+# Accuracy was used to select the optimal model using the largest value.
+# The final values used for the model were size = 1 and decay = 0.1.
+
+predNet = predict(nnetFit, train)
+
+
+confusionMatrix(predNet, train$Class, positive = "Yes")
+
+```
+This model has an accuracy of around 71% compared to the naive model (No Information Rate), of 66% this model is performing okay on training data.  Now to pump in testing data..
+
+```{r}
+predNet = predict(nnetFit, newdata = test)
+
+
+confusionMatrix(predNet, test$Class, positive = "Yes")
+```
+The model is not performing well and is actually almost as bad as the naive model.  When the model is applied to the testing data, it has an accuracy of 66.91 compared to the naive model at 66.42 this is a poor model.
+
+
+```{r}
+control = trainControl(
+  method = "cv",
+  number = 5,
+  savePredictions = "final",
+  classProbs = TRUE,
+  summaryFunction = twoClassSummary,
+  index = createResample(train$Class)
+)
+
+
+
+
+```
+
+
+```{r}
+
+set.seed(111)
+
+model_list = caretList(
+  x=train[,-1], y = train$Class,
+  metric = "ROC",
+  trControl = control,
+  methodList = c("glm", "ranger", "rpart", "nnet"),
+  tuneList = list(
+        ranger = caretModelSpec(method="ranger", max.depth = 5, tuneGrid =
+        expand.grid(mtry = 1:13,
+        splitrule = c("gini","extratrees","hellinger"),
+        min.node.size=1:5)),
+        nn = caretModelSpec(method="nnet", tuneGrid =
+        expand.grid(size = 1:23,
+        decay = c(0.5, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7)),trace=FALSE)))
+
+
+
+
+```
+
+```{r}
+saveRDS(model_list, "model_list.rds")
+rm(model_list)
+model_list = readRDS("model_list.rds")
+
+```
+
+
+```{r}
+
+modelCor(resamples(model_list))
+
+
+```
+Between the models that were implemented, there is a high degree of correlation between them.  The highest correlated models are nnet and glm with a correlation of nearly 1 (0.99).  
+
+```{r}
+ensemble = caretEnsemble(
+  model_list,
+  metric = "ROC",
+  trControl=control
+)
+
+
+
+
+saveRDS(ensemble, "ensemble.rds")
+rm(ensemble)
+ensemble = readRDS("ensemble.rds")
+
+
+summary(ensemble)
+
+```
+The random forest model performed the best with a ROC of .73
+
+```{r}
+#training set
+pred_ensemble = predict(ensemble, train, type = "raw")
+confusionMatrix(pred_ensemble, train$Class)
+
+
+#testing set
+pred_ensemble_test = predict(ensemble, test, type = "raw")
+confusionMatrix(pred_ensemble_test, test$Class)
+
+```
+Wow. On the training data, the model was 99% accurate.  However, when the model was applied to the testing data, there was significant degredation, nearly 33% drop down to .66. Unfortunately, the model also dipped below the naive model.  This is still a poor performing model.... 
+
+Stacked Model
+```{r}
+stack_control = trainControl(
+  method = "cv",
+  number = 10,
+  classProbs =  TRUE)
+
+stack = caretStack(model_list,
+                   method ="glm",
+                   metric = "ROC",
+                   trControl = stack_control)
+
+print(stack)
+
+```
+
+
+```{r}
+#training set for stacked model
+pred_stack = predict(stack, train, type = "raw")
+confusionMatrix(pred_stack, train$Class)
+
+#testing set for stacked model
+pred_stack_test = predict(stack, test, type = "raw")
+confusionMatrix(pred_stack_test, test$Class)
+```
+The stacked model performed just as poorly as the other models when applied to the testing data.. Still no improvements. On to the XGBoost model.
+
+XGBoost Model
+```{r}
+train_dummy = dummyVars(" ~ .", data = train)
+train_xgb = data.frame(predict(train_dummy, newdata = train))
+#str(train_xgb)
+
+
+```
+
+
+```{r}
+test_dummy = dummyVars(" ~ .", data = test)
+test_xgb = data.frame(predict(train_dummy, newdata = test))
+
+
+```
+
+
+```{r}
+train_xgb = train_xgb %>% dplyr::select(-Class.No)
+test_xgb = test_xgb %>% dplyr::select(-Class.No)
+
+
+```
+
+XGBoost Tuning 
+```{r}
+set.seed(999)
+ctrl = trainControl(method = "cv",
+                    number = 5)
+
+tgrid = expand.grid(
+  nrounds = 100,
+  max_depth = c(1,2,3,4),
+  eta = c(0.01, 0.1, 0.2, 0.3),
+  gamma = 0,
+  colsample_bytree = c(0.6, 0.8, 1),
+  min_child_weight = 1,
+  subsample = c(0.8, 1)
+)
+
+
+fitxgb2 = train(as.factor(Class.Yes)~.,
+                data = train_xgb,
+                method="xgbTree",
+                tuneGrid = tgrid,
+                trControl = ctrl)
+
+
+
+```
+
+```{r}
+
+saveRDS(fitxgb2, "fitxgb2.rds")
+rm(fitxgb2)
+```
+
+```{r}
+fitxgb2 = readRDS("fitxgb2.rds")
+plot(fitxgb2)
+
+#fitxgb2
+
+```
+
+```{r}
+predxgbtrain2 = predict(fitxgb2, train_xgb)
+confusionMatrix(as.factor(train_xgb$Class.Yes), predxgbtrain2, positive = "1")
+
+```
+
+```{r}
+
+predxgbtest2 = predict(fitxgb2, test_xgb)
+confusionMatrix(as.factor(test_xgb$Class.Yes), predxgbtest2, positive = "1")
+
+
+```

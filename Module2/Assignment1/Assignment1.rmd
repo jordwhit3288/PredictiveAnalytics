@@ -1,0 +1,150 @@
+---
+title: "Assignment_1"
+author: "Jordan Whitaker"
+date: "5/22/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(GGally)
+
+air = airquality
+
+str(air)
+
+```
+Task 1: There are 153 rows and 6 columns (Ozone, Solar.R, Wind, Temp, Month, Day).  Ozone and Solar.R have NA Values
+
+```{r}
+air2 <- air %>% drop_na()
+str(air2)
+
+```
+Task 2: After removing the NA values, there are 111 rows with 6 variables left.
+
+
+```{r}
+
+ggpairs(air2, label=TRUE)
+
+
+```
+Task 3: The variable most strongly correlated with Ozone is the Temp variable. While the weakest correlated variable is Day
+
+
+```{r}
+
+ggplot(data = air2, aes(x=Temp, y=Ozone)) + 
+  geom_point() + 
+  geom_smooth() +
+  theme_minimal() + 
+  labs(title='Effect of Temp on the Ozone')
+
+
+
+
+
+```
+
+Task 4: The above chart shows a strong relationship between Ozone and Temp
+
+
+```{r}
+
+model1 = lm(Ozone ~ Temp, air2)
+model1
+summary(model1)
+
+confint(model1)
+```
+
+The model shows that the Temp variable is a significant indicator of ozone with a <2e-16 P-Value and the R-Squared is good at .488.  Overall, this model is representative of a relationship between temperature and ozone. The intercept likely lies within the range of -184.81 and -110.47 based on the confint function.
+
+
+```{r}
+ggplot(data = air2, aes(x=Temp, y=Ozone)) + 
+  geom_point(color="blue") + 
+  geom_smooth(method="lm", se=FALSE, color="green") +
+  theme_minimal() + 
+  labs(title='Effect of Temp on the Ozone') 
+
+
+```
+Task 6: ^^^ 
+
+
+Task 7: When Temp is 80, based on the above model, I would predict that the Ozone will be ~50.
+
+```{r}
+summary(model1)
+```
+
+
+Task 8:  The model looks to fit most of the assumptions of a linear regression model.  The relationship is clearly linear with a postiive slope.  The variance of residiuals looks to be somewhat the same from a given value of X.  Observations are independent and I would assume that for a fixed value of X, Y would be normally distrubuted.
+
+
+Task 9:  This model shows a clear relationship between temperature and ozone.  However, when providing advice or promoting this model, it should be noted that although the highest correlated variable was used as a predictor, a single predictor may not be as powerful.  Also, this is a relatively small dataset with only 111 observations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

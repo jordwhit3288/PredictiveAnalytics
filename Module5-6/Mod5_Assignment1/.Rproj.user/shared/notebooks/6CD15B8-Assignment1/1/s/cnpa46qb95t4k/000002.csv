@@ -1,0 +1,8 @@
+"0","fin = fin %>% select('Class',
+`Revenue Growth`, `EPS Diluted`, `EBITDA Margin`, 'priceBookValueRatio', 'debtEquityRatio', 'debtRatio', `PE ratio`, 'Sector', `5Y Revenue Growth (per Share)`, 'returnOnAssets', 'returnOnEquity', 'returnOnCapitalEmployed',
+'quickRatio')
+"
+"2","Warning message:
+"
+"2","Unknown or uninitialised column: 'head'. 
+"

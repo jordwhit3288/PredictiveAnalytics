@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1593190587173.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B4FF1613",
+    "lastKnownWriteTime" : 7598543875853023333,
+    "last_content_update" : 1593190587173,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "33787752",
+        "caption" : "chi_new",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=chi_new&cache_key=33787752",
+        "displayedObservations" : "14594",
+        "environment" : "",
+        "expression" : "chi_new",
+        "object" : "chi_new",
+        "preview" : "0",
+        "totalObservations" : "14594",
+        "variables" : "8"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

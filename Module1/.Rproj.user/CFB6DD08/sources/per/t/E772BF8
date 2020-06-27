@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1589722360518.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3680377892",
+    "id" : "E772BF8",
+    "lastKnownWriteTime" : 1589725511,
+    "last_content_update" : 1589725534986,
+    "path" : "~/UNCW Grad Summer/BAN 502/Module 1/Assignment_3.rmd",
+    "project_path" : "Assignment_3.rmd",
+    "properties" : {
+        "cursorPosition" : "95,22",
+        "last_setup_crc32" : "DF8816E4bb338d19",
+        "scrollLine" : "86",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

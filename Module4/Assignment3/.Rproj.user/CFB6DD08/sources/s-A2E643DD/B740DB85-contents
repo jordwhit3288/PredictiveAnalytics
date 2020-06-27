@@ -1,0 +1,224 @@
+---
+title: "Assignment2"
+author: "Jordan Whitaker"
+date: "6/6/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+options(tidyverse.quiet = TRUE)
+library(tidyverse)
+library(caret)
+library(rpart)
+library(rattle)
+library(RColorBrewer)
+
+```
+
+
+```{r}
+parole = read_csv("parole.csv")
+
+head(parole)
+
+
+
+parole = parole %>% mutate(male = as_factor(as.character(male))) %>%
+mutate(male = fct_recode(male,
+"male" = "1",
+"female" = "0"))
+
+parole = parole %>% mutate(race = as_factor(as.character(race))) %>%
+mutate(race = fct_recode(race,
+"white" = "1",
+"other" = "2"))
+
+parole = parole %>% mutate(state = as_factor(as.character(state))) %>%
+mutate(state = fct_recode(state,
+"Other" = "1",
+"Kentucky" = "2",
+"Lousiana" = "3",
+"Virginia" = "4"))
+
+
+parole = parole %>% mutate(crime = as_factor(as.character(crime))) %>%
+mutate(crime = fct_recode(crime,
+"Other" = "1",
+"larceny" = "2",
+"drug-related" = "3",
+"driving-related" = "4"))
+
+parole = parole %>% mutate(violator = as_factor(as.character(violator))) %>%
+mutate(violator = fct_recode(violator,
+"no-violation" = "0",
+"violated-parole" = "1"))
+
+summary(parole)
+
+```
+
+
+
+```{r}
+set.seed(12345)
+train.rows = createDataPartition(y= parole$violator, p=0.7, list= FALSE)
+
+train = parole[train.rows,]
+test = parole[-train.rows,]
+
+```
+
+```{r}
+head(parole)
+
+tree1 = rpart(violator ~., train, method="class")
+fancyRpartPlot(tree1)
+
+```
+Task 4: A 40 year old parolee from Louisiana who served a 5 year prison sentence would be classified as "no-violation".  At the top of the tree, the first "decision point" is based on state.  If state =Other, Kentucky, Virginia then you go to the left, otherwise, for a state like Louisiana, you go right "no". There is then a decision point based on race, since no race is given in the profile, I am going to stop there and classify the person as no-violation.
+
+```{r}
+printcp(tree1)
+plotcp(tree1)
+```
+
+Task 4: Based on the diagnostic tool above, the ideal CP to reduce error is .030303
+
+```{r}
+tree2 = rpart(violator ~., train, cp=.030303, method="class")
+summary(train)
+
+
+```
+Task 5: The majority class in the training set is clearly no-violation with a count of 418 versus violated-parole at 55.
+
+```{r}
+treepred = predict(tree1, train, type="class")
+head(treepred)
+
+confusionMatrix(treepred,train$violator, positive="violated-parole")
+```
+
+```{r}
+
+treepred_test = predict(tree1, test, type="class")
+head(treepred_test)
+
+confusionMatrix(treepred_test, test$violator, positive="violated-parole")
+
+```
+Task 7:  When the model is applied to the testing data, the accuracy is .896 which is close to the accuracy of the training set (.9027). The accuracy on the testing data is also stronger than the No Information Rate metric which is .8861. With the accuracies being about the same on the training and testing data and with gains over the No Information Rate, I feel confident that this model is not being overfit.
+
+```{r}
+
+blood = read_csv("Blood.csv")
+
+head(blood)
+summary(blood)
+blood = blood %>% mutate(DonatedMarch = as_factor(as.character(DonatedMarch))) %>%
+mutate(DonatedMarch = fct_recode(DonatedMarch,
+"Yes" = "1",
+"No" = "0"))
+
+```
+
+```{r}
+set.seed(1234)
+train.rows2 = createDataPartition(y= blood$DonatedMarch, p=0.7, list= FALSE)
+
+train2 = blood[train.rows2,]
+test2 = blood[-train.rows2,]
+
+head(train2)
+
+```
+
+```{r}
+blood_tree = rpart(DonatedMarch ~., train2, method="class")
+
+fancyRpartPlot(blood_tree)
+
+```
+
+```{r}
+printcp(blood_tree)
+plotcp(blood_tree)
+
+
+```
+
+Task 9: The optimal complexity parameter seems to be 0.016 accoarding to the printcp, it clearly shows that is the parameter that will result in the lowest error. But instead of manually applying that value, I will use the snippet below to prune back to the optimal cp.
+
+
+```{r}
+
+blood_tree2 = prune(blood_tree, cp=blood_tree$cptable[which.min(blood_tree$cptable[,"xerror"]), "CP"])
+
+fancyRpartPlot(blood_tree2)
+
+#blood_tree2 = rpart(DonatedMarch ~., train2, cp=0.016, method="class")
+
+#Training Prediction and Confusion Matrix
+blood_treepred = predict(blood_tree2, train2, type="class")
+head(blood_treepred)
+
+confusionMatrix(blood_treepred, train2$DonatedMarch, positive="Yes")
+
+```
+
+```{r}
+blood_treepred_test = predict(blood_tree2, test2, type="class")
+head(blood_treepred_test)
+
+confusionMatrix(blood_treepred_test, test2$DonatedMarch, positive="Yes")
+
+```
+
+When the model was applied to the testing data it had an accuracy of .7545 which unfortunately resulted in a
+performance drop of roughly 6%.  The model also performed about a percent worse than the No Information Rate.  The predictions overall were not great. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

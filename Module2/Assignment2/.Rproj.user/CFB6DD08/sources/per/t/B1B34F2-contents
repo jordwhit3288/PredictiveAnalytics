@@ -1,0 +1,149 @@
+---
+title: "Assignment2.rmd"
+author: "Jordan Whitaker"
+date: "5/25/2020"
+output: word_document
+---
+```{r}
+options(tidyverse.quiet = TRUE)
+library(tidyverse)
+library(GGally)
+library(car)
+library(gridExtra)
+library(MASS)
+```
+
+```{r}
+bike = read_csv("hour.csv")
+
+View(bike)
+
+bike = bike %>% mutate(season = as_factor(as.character(season))) %>%
+mutate(season = fct_recode(season,
+"Spring" = "1",
+"Summer" = "2",
+"Fall" = "3",
+"Winter" = "4"))
+
+head(bike) #key reference to ensure code snippets below were successful 
+
+bike = bike %>% mutate(yr = as_factor(as.character(yr))) %>%
+mutate(yr = fct_recode(yr))
+
+
+bike = bike %>% mutate(mnth = as_factor(as.character(mnth))) %>%
+mutate(mnth = fct_recode(mnth))
+
+bike = bike %>% mutate(hr = as_factor(as.character(hr))) %>%
+mutate(hr = fct_recode(hr))
+
+
+bike = bike %>% mutate(workingday = as_factor(as.character(workingday))) %>%
+mutate(workingday = fct_recode(workingday,
+"NotWorkingDay" = "0",
+"WorkingDay" = "1"))
+
+
+bike = bike %>% mutate(weathersit = as_factor(as.character(weathersit))) %>%
+mutate(weathersit = fct_recode(weathersit,
+"NoPrecip" = "1",
+"Misty" = "2",
+"LightPrecip" = "3",
+"HeavyPrecip" = "4"))
+
+
+bike = bike %>% mutate(weekday = as_factor(as.character(weekday))) %>%
+mutate(weekday = fct_recode(weekday,
+"Monday" = "1",
+"Tuesday" = "2",
+"Wednesday" = "3",
+"Thursday" = "4",
+"Friday" = "5",
+"Saturday" = "6",
+"Sunday"= "0"))
+
+```
+Task 1: 
+When making a multi-linear regression model, if the data being used is categorical in nature, but is represented in the data as either binary or numerical, a conversion to a factor is required so that the model can interpret the fields and apply them to the model correctly.
+
+
+
+```{r}
+bike_quant = bike %>% dplyr::select(holiday, temp, atemp, hum, windspeed, count)
+
+ggpairs(bike_quant, label=TRUE)
+
+
+
+```
+Task 2:  The temp and atemp variables are most correlated to the count variable. Around .40
+
+```{r}
+season_plt <- ggplot(bike, aes(x=season, y=count)) + 
+  geom_boxplot()
+
+yr_plt <- ggplot(bike, aes(x=yr, y=count)) + 
+  geom_boxplot() 
+
+mnth_plt <- ggplot(bike, aes(x=mnth, y=count)) + 
+  geom_boxplot()
+
+hr_plt <- ggplot(bike, aes(x=hr, y=count)) + 
+  geom_boxplot()
+
+weekdy_plt <- ggplot(bike, aes(x=weekday, y=count)) + 
+  geom_boxplot()
+
+workingdy_plt <- ggplot(bike, aes(x=workingday, y=count)) + 
+  geom_boxplot()
+
+weather_plt <- ggplot(bike, aes(x=weathersit, y=count)) + 
+  geom_boxplot()
+
+
+grid.arrange(season_plt, yr_plt, mnth_plt, hr_plt, weekdy_plt, workingdy_plt, weather_plt, nrow= 3 )
+
+```
+
+```{r}
+
+
+allmod = lm(count ~., bike)
+summary(allmod)
+
+emptymod = lm(count ~1, bike)
+summary(emptymod)
+
+#bike = bike %>% dplyr::select(-c(instant, dteday, registered, casual))
+
+forwardmod = stepAIC(emptymod, direction='forward', scope=list(upper=allmod,lower=emptymod),
+                     trace = TRUE)
+summary(forwardmod)
+```
+
+
+
+```{r}
+vif(forwardmod)
+
+```
+Task 4: 
+These are the variables used in the forward model: 
+hr + atemp + yr + weathersit + season + mnth + hum + weekday + holiday + windspeed + temp
+
+This model has an adjusted R-Squared of ~.69 which is an indicator of a good model.  Based on the VIF metric, there are instances of multi-collinearity between atemp and temp.  Common sense also has me thinking there is a high degree of multi-collinearity between the season and month variables as well as the working day and day variables as these two sets are naturally tightly coupled.
+
+
+
+```{r}
+backmod = stepAIC(allmod, direction = "backward", trace = TRUE)
+summary(backmod)
+
+```
+Task 5: The backward stepwise model is the same as the forward stepwise model.
+
+Task 6: After analyzing the allmod model, my assumption is that the weekday variable is the culprit that is kicking out/overriding the workingday variable.  This is because weekday is most likely the driver to encode what a working day is or is not.
+
+Task 7:  Overall, the model does appropriately describe a relationship between the predictors and the response variable.  With an adjusted R-squred of nearly .69 I think this model is pretty strong.  However, as noted above, there are some tightly coupled variables that should be pruned and of course the model could be tweaked a bit further.  But the first iteration is a good one.
+
+

@@ -1,0 +1,19 @@
+"0","print(opt.cut(ROCRperf, ROCRpred))
+"
+"1","           "
+"1","      [,1]"
+"1","
+sensitivity"
+"1"," 0.7272727"
+"1","
+specificity"
+"1"," 0.8588517"
+"1","
+cutoff     "
+"1"," 0.2069629"
+"1","
+"
+"2","Warning message:
+"
+"2","package ‘ROCR’ was built under R version 3.6.3 
+"

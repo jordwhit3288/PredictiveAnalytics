@@ -1,0 +1,675 @@
+---
+title: "Course Project - Phase 1"
+author: "Jordan Whitaker"
+date: "6/15/2020"
+output: word_document
+always_allow_html: true
+
+---
+```{r setup, include=FALSE}
+#install.packages(c("flexdashboard", "ggplot2", "tidyverse", "lubridate", "corrplot", "ggthemes", "plotly", #"RColorBrewer"))
+#require(devtools); install_version("rmarkdown", version = "1.17", repos = "http://cran.us.r-project.org")
+
+#install.packages(c("caret", "nnet", "rpart", "ranger", "caretEnsemble", "xgboost", "rattle", "MASS", "ROCR"))
+
+library(rattle)
+options(tidyverse.quiet = TRUE)
+library("caret")
+library("nnet")
+library("rpart")
+library("ranger")
+library("caretEnsemble")
+library("xgboost")
+library(flexdashboard)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(corrplot)
+library(ggthemes)
+library(plotly)
+library(RColorBrewer)
+library(scales)
+library(MASS)
+library(ROCR)
+```
+
+
+
+```{r}
+chi <- read_csv("chicago2.csv")
+
+#head(chi)
+
+chi = chi[, -c(2,3, 17, 18, 20, 23)]
+
+chi = chi %>% mutate(Date = mdy_hms(Date))
+#head(chi)
+
+chi = chi %>% mutate(Hour = hour(Date)) 
+
+```
+
+```{r}
+# Creating chi_new df
+chi_new = chi %>% group_by(chi$`Primary Type`) %>% filter(n() > 20)
+chi_new$Quarter = format(chi_new$Date, "%m")
+chi_new = chi_new[, -c(19)]
+
+```
+
+
+## Creating Factors and Prepping Data
+
+```{r}
+
+chi_new$Hour = as.factor(case_when(
+  chi_new$Hour <=5 ~ 'Early_Morning',
+  chi_new$Hour >=6 & chi_new$Hour <=11 ~ 'Morning',
+  chi_new$Hour >=12 & chi_new$Hour <=17 ~ 'Afternoon',
+  chi_new$Hour >=18 & chi_new$Hour <=24 ~ 'Night'
+))
+
+
+chi_new$Hour <- factor(chi_new$Hour, levels=c("Early_Morning", "Morning", "Afternoon", "Night"))
+
+chi_new$Quarter = as.numeric(chi_new$Quarter)
+
+chi_new$Quarter = as.factor(case_when(
+  chi_new$Quarter <= 3 ~ 'Q1',
+  chi_new$Quarter > 3 & chi_new$Quarter <=6 ~ 'Q2',
+  chi_new$Quarter >= 7 & chi_new$Quarter <= 10 ~ 'Q3',
+  chi_new$Quarter >= 10 & chi_new$Quarter <= 12 ~ 'Q4'
+))
+
+
+
+
+chi_new$Arrest = as.factor(case_when(
+  chi_new$Arrest == 'TRUE' ~ 'Arrest',
+  chi_new$Arrest == 'FALSE' ~ 'NO_Arrest'
+))
+
+
+
+chi_new$Offense <- paste(chi_new$`Primary Type`, chi_new$Description)
+
+
+chi_new$Hour = as.factor(chi_new$Hour)
+chi_new$`Primary Type` = as.factor(chi_new$`Primary Type`)
+chi_new$`Location Description` = as.factor(chi_new$`Location Description`)
+
+
+chi_new = chi_new[, -c(5, 6)]
+
+
+chi_new <- 
+  chi_new %>% 
+  mutate(
+    Offense_new = case_when(
+      str_detect(Offense, 'ASSAULT AGG') ~ 'AGGREVATED ASSAULT',
+      str_detect(Offense, 'ASSAULT SIMPLE|ASSAULT PRO') ~ 'SIMPLE ASSAULT',
+      str_detect(Offense, 'BATTERY') ~ 'BATTERY',
+      str_detect(Offense, 'BURGLARY') ~ 'BURGLARY',
+      str_detect(Offense, 'CRIM SEXUAL') ~ 'CRIMINAL SEX OFFENSE',
+      str_detect(Offense, 'CRIMINAL DAMAGE') ~ 'CRIMINAL DAMAGE',
+      str_detect(Offense, 'CRIMINAL TRESPASS') ~ 'CRIMINAL TRESPASS',
+      str_detect(Offense, 'DECEPTIVE PRACTICE') ~ 'DECEPTIVE PRACTICE',
+      str_detect(Offense, 'HOMICIDE') ~ 'HOMICIDE',
+      str_detect(Offense, 'INTERFERENCE') ~ 'INTERFERENCE',
+      str_detect(Offense, 'MOTOR VEHICLE THEFT') ~ 'MOTOR VEHICLE THEFT',
+      str_detect(Offense, 'NARCOTICS') ~ 'NARCOTICS',
+      str_detect(Offense, 'OFFENSE INVOLVING CHILDREN') ~ 'OFFENSE INVOLVING CHILDREN',
+      str_detect(Offense, 'OTHER OFFENSE') ~ 'OTHER OFFENSE',
+      str_detect(Offense, 'PROSTITUTION') ~ 'PROSTITUTION',
+      str_detect(Offense, 'PUBLIC PEACE') ~ 'PUBLIC PEACE',
+      str_detect(Offense, 'ROBBERY') ~ 'ROBBERY',
+      str_detect(Offense, 'SEX OFFENSE') ~ 'SEX OFFENSE',
+      str_detect(Offense, 'THEFT') ~ 'THEFT',
+      str_detect(Offense, 'WEAPONS VIOLATION') ~ 'WEAPONS VIOLATION'
+      ))
+
+chi_new$Offense_new = as.factor(chi_new$Offense_new)
+
+#View(chi)
+
+chi_new$`Location Description` = case_when(
+      str_detect(chi_new$`Location Description`, 'SIDEWALK|STREET') ~ 'STREET',
+      str_detect(chi_new$`Location Description`, 'AUTO|VEHICLE') ~ 'VEHICLE',
+      str_detect(chi_new$`Location Description`, 'BANK') ~ 'BANK',
+      str_detect(chi_new$`Location Description`, 'BOAT|LAKE') ~ 'WATER_LOCATION',
+      str_detect(chi_new$`Location Description`, 'BRIDGE') ~ 'BRIDGE',
+      str_detect(chi_new$`Location Description`, 'CHURCH') ~ 'PLACE OF WORSHIP',
+      str_detect(chi_new$`Location Description`, 'COLLEGE') ~ 'COLLEGE_UNIVERSITY',
+      str_detect(chi_new$`Location Description`, 'CTA') ~ 'CTA_LOCATION',
+      str_detect(chi_new$`Location Description`, 'FEDERAL|GOVERNMENT|POLICE|FIRE') ~ 'GOVT BUILDING',
+      str_detect(chi_new$`Location Description`, 'HIGHWAY') ~ 'HIGHWAY',
+      str_detect(chi_new$`Location Description`, 'JAIL') ~ 'JAIL',
+      str_detect(chi_new$`Location Description`, 'FOREST|PARK PROPERTY') ~ 'PARK',
+      str_detect(chi_new$`Location Description`, 'PARKING LOT') ~ 'PARKING LOT',
+      str_detect(chi_new$`Location Description`, 'SCHOOL') ~ 'SCHOOL',
+      str_detect(chi_new$`Location Description`, 'SPORTS') ~ 'SPORTING ARENA',
+      str_detect(chi_new$`Location Description`, 'TAXI') ~ 'TAXI',
+      str_detect(chi_new$`Location Description`, 'STORE|CLUB|BAR|BOWLING|CAR WASH|COMMERCIAL|CONSTRUCTION SITE|DAY CARE CENTER|FACTORY|GAS STATION|LIBRARY|THEATER|SHOP|RESTAURANT|SAVINGS AND LOAN|ATM|CURRENCY EXCHANGE') ~ 'STORE',
+      str_detect(chi_new$`Location Description`, 'APARTMENT|DRIVEWAY|HALLWAY|HOTEL|HOUSE|NURSING HOME|PORCH|POOL ROOM|RESIDENCE|RESIDENTIAL|YARD') ~ 'RESIDENTIAL',
+      str_detect(chi_new$`Location Description`, 'AIR') ~ 'AIRPORT',
+      str_detect(chi_new$`Location Description`, 'HOSPITAL|MEDICAL') ~ 'HOSPITAL',
+      str_detect(chi_new$`Location Description`, 'OTHER|ABANDONED BUILDING|ALLEY|VACANT|WAREHOUSE') ~ 'OTHER'
+      )
+
+colnames(chi_new)[5]= 'location_description'
+  
+chi_new$location_description = as.factor(chi_new$location_description)
+
+
+chi_new$District = case_when(
+  chi_new$District == '001' ~ 1,
+  chi_new$District == '002' ~ 2,
+  chi_new$District == '003' ~ 3,
+  chi_new$District == '004' ~ 4,
+  chi_new$District == '005' ~ 5,
+  chi_new$District == '006' ~ 6,
+  chi_new$District == '007' ~ 7,
+  chi_new$District == '008' ~ 8,
+  chi_new$District == '009' ~ 9,
+  chi_new$District == '010' ~ 10,
+  chi_new$District == '011' ~ 11,
+  chi_new$District == '012' ~ 12,
+  chi_new$District == '013' ~ 13,
+  chi_new$District == '014' ~ 14,
+  chi_new$District == '015' ~ 15,
+  chi_new$District == '016' ~ 16,
+  chi_new$District == '017' ~ 17,
+  chi_new$District == '018' ~ 18,
+  chi_new$District == '019' ~ 19,
+  chi_new$District == '020' ~ 20,
+  chi_new$District == '021' ~ 21,
+  chi_new$District == '022' ~ 22,
+  chi_new$District == '023' ~ 23,
+  chi_new$District == '024' ~ 24,
+  chi_new$District == '025' ~ 25,
+)
+
+chi_new = chi_new %>% group_by(chi_new$location_description) %>% filter(n() > 20)
+
+chi_new <- drop_na(chi_new)
+
+```
+
+
+## Plotting Data 
+```{r}
+
+
+
+offense_arrest <- ggplot(chi_new, aes(Offense_new, fill = Arrest)) +
+  geom_bar(aes(y=..count../sum(..count..))) + 
+  theme_gdocs()  + theme(axis.text.x = element_text(angle = 30)) +
+ scale_y_continuous(limits = c(0, .25), labels=percent_format()) +
+  #scale_y_log10() +
+  scale_fill_manual(values = c("dark grey", "light blue")) +
+  labs(title= "Offense VS Arrest Status", x = "Offense", y ="Percent") 
+#location_arrest
+
+ggplotly(offense_arrest, tooltip =FALSE) 
+
+
+
+
+
+
+
+
+```
+
+
+    
+```{r}
+hour_arrest <- ggplot(chi_new, aes(Arrest, fill = Hour)) +
+  geom_bar(aes(y=..count../sum(..count..)), position = "dodge") +
+  #geom_bar(position = "dodge") +
+  theme_gdocs() +
+  scale_fill_brewer(type = "seq", palette = "YlOrRd") + 
+  scale_y_continuous(limits = c(0, .30), labels=percent_format()) +
+  #scale_fill_manual(values = c("orange", "light blue", "yellow", "dark grey")) +
+  labs(title = "Time of Offense VS Arrest Status", x="Arrest Status", y="Percent") 
+
+hour_arrest_plotly <- ggplotly(hour_arrest, tooltip = FALSE) 
+hour_arrest_plotly
+
+```
+    
+
+
+```{r}
+
+
+# 
+# district_arrest <- ggplot(chi_new, aes(District, fill = Arrest)) +
+#   geom_bar(aes(y=..count../sum(..count))) + theme(axis.text.x = element_text(vjust = 0.5,
+#     angle = 90)) +
+#   scale_fill_manual(values = c("dark grey", "light blue"))  +
+#   theme_gdocs()+
+#   scale_x_continuous(breaks = c(1:25, 0)) +
+#   labs(title="Police District VS Arrest Status", y="Count", x="Police District")
+# district_arrest
+
+quarter_arrest <- ggplot(chi_new, aes(Arrest, fill = Quarter)) +
+  geom_bar(aes(y=..count../sum(..count..)), position = "dodge") +
+  #geom_bar(position = "dodge") +
+  theme_gdocs() +
+  scale_fill_brewer(type = "seq", palette = "YlOrRd") + 
+  scale_y_continuous(limits = c(0, .30), labels=percent_format()) + 
+  #scale_fill_manual(values = c("orange", "light blue", "yellow", "dark grey")) +
+  labs(title = "Quarter VS Arrest Status", x= "Arrest Status", y ="Percent")
+quarter_arrest_plotly <- ggplotly(quarter_arrest, tooltip = FALSE) 
+quarter_arrest_plotly
+
+
+```
+
+
+
+```{r}
+location_arrest <- ggplot(chi_new, aes(location_description, fill = Arrest)) +
+  geom_bar(position = "dodge") + 
+  theme_gdocs()  + theme(axis.text.x = element_text(angle = 30)) +
+  scale_fill_manual(values = c("dark grey", "light blue")) +
+  scale_y_log10() + 
+  labs(title= "blank title", x = "Offense Location", y ="Count", caption="Y-Axis on Log10 Scale") 
+#location_arrest
+# location_arrest
+
+# test <- ggplot(chi_new, aes(location_description, fill = Arrest)) +
+#   geom_bar(aes(y=..count../sum(..count..))) +
+#   scale_y_continuous(labels = percent_format())  + theme(axis.text.x = element_text(vjust = 0.5, 
+#     angle = 30))
+# 
+# ggplotly(test)
+ 
+ location_arrest_plotly <- ggplotly(location_arrest, tooltip = FALSE) %>% 
+   layout(title = list(text = paste0('Offense Location VS Arrest Status',
+                                     '<br>',
+                                     '<sup>',
+                                     'Y-Axis on Log10 Scale',
+                                     '<br>',
+                                     '</sup>')))
+ location_arrest_plotly
+ 
+
+```
+
+# Doing some more data prep.... 
+```{r}
+
+#unique(chi_new$District)
+central = c(1,2,3,8,9,10,12, 18)
+south = c(4,5,6,7,22)
+north = c(11, 14, 15, 16, 17, 19, 20, 24, 25)
+  
+chi_new$District = case_when(
+  chi_new$District  %in% central ~ 'Central',
+  chi_new$District %in% south ~ 'South',
+  chi_new$District %in% north ~ 'North')
+
+chi_new$District = as.factor(chi_new$District)
+
+unique(chi_new$Ward)
+far_southest_side = c()
+
+
+#head(chi_new$District)
+
+```
+
+
+
+# MODEL DEVELOPMENT
+
+```{r}
+head(chi_new)
+cols = c(5,6,7,9,10,16,17,19)
+
+chi_new = chi_new[,cols]
+chi_new = chi_new[,-5]
+```
+
+
+
+
+## Splitting data into training/testing 
+```{r}
+
+set.seed(1234)
+train.rows = createDataPartition(y = chi_new$Arrest, p=0.7, list = FALSE)
+train = dplyr::slice(chi_new, train.rows)
+test = dplyr::slice(chi_new, -train.rows)
+
+#head(train)
+```
+
+
+### Decision Tree
+
+```{r}
+tree_model = rpart(Arrest ~., train, method = "class")
+fancyRpartPlot(tree_model)
+printcp(tree_model)
+plotcp(tree_model)
+
+
+tree_model_simple = rpart(Arrest ~ Offense_new + location_description + Domestic + District,
+                          method = "class", data = train)
+
+simple_tree_train = predict(tree_model_simple, train, type= "class")
+confusionMatrix(simple_tree_train, train$Arrest, positive = "Arrest")
+
+
+#before pruning
+no_prune_arrest_tree_train = predict(tree_model, train, type= "class")
+confusionMatrix(no_prune_arrest_tree_train, train$Arrest, positive = "Arrest")
+#87.18
+
+no_prune_arrest_tree_test = predict(tree_model, test, type= "class")
+confusionMatrix(no_prune_arrest_tree_test, test$Arrest, positive = "Arrest")
+#87.21
+
+#Pruning
+tree_model2 = prune(tree_model, cp=tree_model$cptable[which.min(tree_model$cptable[,"xerror"]), "CP"])
+
+fancyRpartPlot(tree_model2)
+
+
+#After pruning
+#training data applied
+arrest_tree_train = predict(tree_model2, train, type="class")
+
+
+head(arrest_tree_train)
+
+confusionMatrix(arrest_tree_train, train$Arrest, positive="Arrest")
+#87.18
+
+#testing data
+arrest_tree_test = predict(tree_model2, test, type="class")
+head(arrest_tree_test)
+
+confusionMatrix(arrest_tree_test, test$Arrest, positive="Arrest")
+#87.21
+
+plot(arrest_tree_test, uniform=TRUE,
+   main="Classification Tree for Kyphosis")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
+
+```
+
+
+
+
+
+## Neural Network
+```{r}
+
+#chi_new = as.data.frame(chi_new)
+
+start_time = Sys.time()
+fitControl = trainControl(method = "cv",
+                          number = 10)
+
+# chi_new
+set.seed(1234)
+nnetBasic = train(x=chi_new[,-2], y=chi_new$Arrest,
+                  method = "nnet",
+                  trControl = fitControl,
+                  trace = FALSE)
+
+end_time = Sys.time()
+end_time - start_time
+
+# Predictions on training set
+predNetBasic = predict(nnetBasic, train)
+confusionMatrix(predNetBasic, train$Arrest, positive = "Arrest")
+# 87.63
+
+
+#Predictions on testing set
+predNetBasic_test = predict(nnetBasic, test)
+confusionMatrix(predNetBasic_test, test$Arrest, positive = "Arrest")
+# 87.75
+
+
+
+summary(chi_new)
+
+### Tuning Model
+nnetGrid = expand.grid(size = 1:23,
+                       decay = c(0.5, 0.1, 1e-2, 1e-3, 1e-4, 1e-5,1e-6, 1e-7))
+
+set.seed(1234)
+nnetTuned = train(x=chi_new[,-2], y=chi_new$Arrest,
+                method = "nnet",
+                trControl = fitControl,
+                tuneGrid = nnetGrid,
+                verbose = FALSE,
+                trace = FALSE)
+
+```
+
+## Regression Step-Wise
+```{r}
+allmod = glm(Arrest ~., train, family = "binomial")
+
+emptymod = glm(Arrest~1, train, family = "binomial")
+
+forwardmod = stepAIC(emptymod, direction = "forward", scope=list(upper=allmod, lower=emptymod), trace = TRUE)
+summary(forwardmod)
+
+model = glm(Arrest ~ Offense_new + Domestic, train, family = "binomial")
+
+summary(model)
+
+```
+
+### Finding the optimal threshold 
+```{r}
+predictions = predict(model, type = "response")
+
+ROCRpred = prediction(predictions, train$Arrest)
+
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+
+
+plot(ROCRperf, colorize= TRUE, print.cutoffs.at=seq(0,1,by=0.1), text.adj=c(-0.2,1.7))
+
+
+
+print(opt.cut(ROCRperf, ROCRpred))
+
+t1 = table(train$Arrest, predictions > 0.6)
+train_accuracy()
+#87.17
+
+predict_test = predict(model, newdata = test, type= "response")
+
+t1_test = table(test$Arrest, predict_test > 0.6)
+test_accuracy()
+#87.20
+
+```
+
+### Functions for Classification Regression
+```{r}
+
+opt.cut = function(perf,pred){
+  cut.ind = mapply(FUN=function(x,y,p){
+    d = (x -0)^2 + (y-1)^2
+    ind = which(d == min(d))
+    c(sensitivity = y[[ind]], specificity = 1-x[[ind]],
+      cutoff = p[[ind]])
+  }, perf@x.values, perf@y.values, pred@cutoffs)
+}
+
+
+train_accuracy = function(){
+  x = t1[1,1]
+  y = t1[2,2]
+  top = x +y
+  bottom = nrow(train)
+  accuracy = top/bottom
+  print(accuracy)
+}
+
+
+test_accuracy = function(){
+  x = t1_test[1,1]
+  y = t1_test[2,2]
+  top = x +y
+  bottom = nrow(test)
+  accuracy = top/bottom
+  print(accuracy)
+}
+
+```
+
+
+
+## Random Forest
+```{r}
+fit_control = trainControl(method = "cv",
+                           number = 10) #10 fold cross validation
+
+set.seed(123)
+rf_fit = train(as.matrix(train[,-2]), y=as.matrix(train$Arrest),
+               method = "ranger",
+               importance= "permutation",
+               trControl = fit_control,
+               num.trees = 100)
+
+
+```
+
+```{r}
+
+varImp(rf_fit)
+
+predRF = predict(rf_fit, train)
+
+confusionMatrix(predRF, train$Arrest, positive="Arrest")
+#84.7
+
+
+
+```
+
+
+```{r}
+
+
+
+
+
+```
+
+
+```{r}
+
+
+control = trainControl(
+  method = "cv",
+  number = 5,
+  savePredictions = "final",
+  classProbs = TRUE,
+  summaryFunction = twoClassSummary,
+  index = createResample(train$Arrest)
+)
+
+
+model_list = caretList(
+  x=train[,-2], y = train$Arrest,
+  metric = "ROC",
+  trControl = control,
+  methodList = c("glm", "ranger", "rpart"),
+  tuneList = list(
+        ranger = caretModelSpec(method="ranger", max.depth = 5, tuneGrid =
+        expand.grid(mtry = 1:13,
+        splitrule = c("gini","extratrees","hellinger"),
+        min.node.size=1:5))
+        ))
+
+
+
+
+```
+
+
+```{r}
+ensemble = caretEnsemble(
+  model_list,
+  metric = "ROC",
+  trControl = control
+)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

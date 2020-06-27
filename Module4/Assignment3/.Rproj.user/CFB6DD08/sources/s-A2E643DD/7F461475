@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591459351649.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7F461475",
+    "lastKnownWriteTime" : 1591578740,
+    "last_content_update" : 1591578740097,
+    "path" : "~/UNCW_Grad_Summer/BAN502/Module4/Assignment3/Assignment3.rmd",
+    "project_path" : "Assignment3.rmd",
+    "properties" : {
+        "cursorPosition" : "66,0",
+        "last_setup_crc32" : "",
+        "scrollLine" : "44",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

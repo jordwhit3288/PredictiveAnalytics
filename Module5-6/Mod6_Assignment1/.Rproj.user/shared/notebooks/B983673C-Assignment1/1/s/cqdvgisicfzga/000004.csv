@@ -1,0 +1,4 @@
+"0","bball2 = select(AdjTempo:FTRateD)
+"
+"2","Error in select(AdjTempo:FTRateD) : object 'AdjTempo' not found
+"

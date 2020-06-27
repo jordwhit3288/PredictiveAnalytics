@@ -1,0 +1,5 @@
+"0","trucks2 = trucks %>% select(trucks$Distance, trucks$Speeding)
+"
+"2","Error: Must subset columns with a valid subscript vector.
+[31mx[39m Can't convert from <double> to <integer> due to loss of precision.
+"

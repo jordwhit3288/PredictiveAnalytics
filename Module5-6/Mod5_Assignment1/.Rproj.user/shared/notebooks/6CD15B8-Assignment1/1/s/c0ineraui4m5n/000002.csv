@@ -1,0 +1,22 @@
+"0","ensemble = caretEnsemble(
+  model_list,
+  metric = ""ROC"",
+  trControl=control
+)
+ensemble = caretEnsemble(
+  model_list,
+  metric = ""ROC"",
+  trControl=control
+)
+summary(ensemble)
+"
+"1","The following models were ensembled: ranger, nn, glm, ranger.1, rpart, nnet 
+"
+"1","They were weighted: 
+"
+"1","2.5765 -1.8388 1.0164 -1.2777 -3.2923 0.5243 -0.3121
+"
+"1","The resulting ROC is: 0.72
+"
+"1","The fit for each individual model on the ROC is: 
+"

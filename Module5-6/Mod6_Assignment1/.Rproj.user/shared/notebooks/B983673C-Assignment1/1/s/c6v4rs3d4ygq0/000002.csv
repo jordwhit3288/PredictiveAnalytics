@@ -1,0 +1,4 @@
+"0","set.seed(64)"
+"0","clusters_new = kmeans(trucks2, 4)"
+"0",""
+"0","fviz_cluster(clusters_new, trucks2)"

@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590424470648.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1BE81D37",
+    "lastKnownWriteTime" : 32369901497548870,
+    "last_content_update" : 1590424470648,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "B27A5207",
+        "caption" : "predict_train",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=predict_train&cache_key=B27A5207",
+        "displayedObservations" : 12167,
+        "environment" : "",
+        "expression" : "predict_train",
+        "object" : "predict_train",
+        "preview" : 0,
+        "totalObservations" : 12167,
+        "variables" : 1
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

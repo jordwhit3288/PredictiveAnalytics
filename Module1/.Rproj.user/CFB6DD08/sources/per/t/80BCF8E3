@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1589724007988.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2722806520",
+    "id" : "80BCF8E3",
+    "lastKnownWriteTime" : 1589285220,
+    "last_content_update" : 1589285220,
+    "path" : "~/R-Scripts/Corona/Coronavirus_USA.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "81,0",
+        "scrollLine" : "56"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

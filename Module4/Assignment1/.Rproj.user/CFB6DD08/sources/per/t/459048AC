@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1591452162991.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "459048AC",
+    "lastKnownWriteTime" : 25895921200201782,
+    "last_content_update" : 1591452162991,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "F5EB1FF3",
+        "caption" : "column_wise_grades",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=column_wise_grades&cache_key=F5EB1FF3",
+        "displayedObservations" : 99,
+        "environment" : "",
+        "expression" : "column_wise_grades",
+        "object" : "column_wise_grades",
+        "preview" : 0,
+        "totalObservations" : 99,
+        "variables" : 2
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

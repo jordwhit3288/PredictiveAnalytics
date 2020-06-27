@@ -1,0 +1,114 @@
+---
+title: "Assignment3"
+author: "Jordan Whitaker"
+date: "5/17/2020"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# Task 1
+install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+library(tidyverse)
+```
+
+
+```{r}
+# Task 2 
+diamonddata = diamonds
+
+ncol(diamonddata) #10
+nrow(diamonddata) #53940
+
+```
+```{r}
+# Task 3
+
+ggplot(data = diamonddata, aes(x=carat, y=price)) +
+  geom_point()
+
+# The relationship shows that price increases as carat increases.
+
+
+```
+
+```{r}
+# Task 4 
+
+ggplot(data = diamonddata, aes(x=carat, y=price, color = cut)) +
+  geom_point()
+
+# The relationship between carat, price, and cut shows that the quality of the cut makes a big difference in the overall price.  Carat size becomes less important and cut increases in signifigance.
+```
+
+
+```{r}
+# Task 5
+
+ggplot(data = diamonddata, aes(x=carat, y=price, color = cut)) +
+  geom_point() +
+  facet_wrap( ~ color, nrow = 2)
+
+# When adding in the color variable, for the 'colorless' grades their price increase is more steep compared to the color grades that may have more inclusions or flaws.
+```
+
+
+```{r}
+# Task 6
+#library(readr)
+inventory <- read_csv("InventoryData.csv")
+
+summary(inventory)
+structure(inventory)
+
+```
+
+
+
+```{r}
+# Task 7
+
+inventoryA <- filter(inventory, inventory$Supplier == 'A')
+nrow(inventoryA) # 3695
+```
+
+```{r}
+# Task 8
+
+inventoryA = mutate(inventoryA, OnHandRatio = `On Hand` / `Annual Demand`)
+
+#This line of code uses the inventoryA dataframe and uses a function called mutate to create a new column in the dataframe that represents the quotient of columns 'On Hand' and 'Annual Demand'.
+
+```
+
+
+```{r}
+# Task 9
+
+avg_cost <- inventory %>%
+  group_by(`Item SKU`)
+  
+avg_cost <-  summarize(avg_cost, SKUAvgCost = mean(`Cost per Unit ($)`))
+
+
+```
+
+```{r}
+# Task 10
+
+# This was a great refresher and helped re-enforce syntax of the tidyverse library. 
+
+```
+
+
+
+
+
+

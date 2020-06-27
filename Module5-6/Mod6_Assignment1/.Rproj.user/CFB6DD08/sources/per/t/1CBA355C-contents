@@ -1,0 +1,136 @@
+---
+title: "Assignment 1"
+author: "Jordan Whitaker"
+date: "6/21/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages(c("tidyverse", "cluster", "factoextra", "dendextend"))
+options(tidyverse.quiet = TRUE)
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+```
+
+
+```{r}
+trucks = read_csv("trucks.csv")
+
+```
+
+
+Task 1: Looking at Relationship between Distance and Speeding 
+There definitely seems to be a strong grouping of points in three places.  There are also some scatter points that could be grouped into a few more clusters. 
+```{r}
+ggplot(trucks, aes(Distance, Speeding)) + 
+  geom_point()
+
+```
+
+
+Task 2:
+```{r}
+
+trucks2 = trucks %>% select(Distance, Speeding)
+
+trucks2 = as.data.frame(scale(trucks2))
+
+
+```
+
+
+
+Task 3:  The below cluster plot, with 2 clusters, does fully embody all of the points.  However, these two clusters might not tell the entire story of the data.  I believe that there is still a need to increase the number of clusters.  Diagnostic measures will tell..
+```{r}
+
+set.seed(64)
+clusters = kmeans(trucks2, 2)
+
+fviz_cluster(clusters, trucks2)
+```
+
+Task 4: The two diagnostic measures to identify the optimal K value seem to agree on 4 clusters. 
+```{r}
+set.seed(64)
+fviz_nbclust(trucks2, kmeans, method ="wss")
+
+fviz_nbclust(trucks2, kmeans, method ="silhouette")
+```
+
+
+
+Task 5:
+```{r}
+set.seed(64)
+clusters_new = kmeans(trucks2, 4)
+
+fviz_cluster(clusters_new, trucks2)
+
+
+```
+Task 6: 
+I would describe the above cluster plot as beautiful.  These four clusters seem to fully describe the data and there would strong evidence to back any decisions being made around this data.
+
+
+-------------------------------------------------------------
+
+```{r}
+bball = read_csv("kenpom20.csv")
+
+
+```
+Task 7:
+```{r}
+bball2 = bball %>% select(AdjTempo:FTRateD)
+
+bball2 = as.data.frame(scale(bball2))
+
+```
+
+
+There does not seem to be consensus between the two methods.  With the WSS method, I would have picked 4 clusters, while the silhouette method identified 2 as the optimal number.
+```{r}
+set.seed(123)
+fviz_nbclust(bball2, kmeans, method ="wss")
+
+fviz_nbclust(bball2, kmeans, method ="silhouette")
+
+
+```
+Task 8:
+```{r}
+set.seed(1234)
+clusters_bball = kmeans(bball2, 4)
+
+fviz_cluster(clusters_bball, bball2)
+
+clusters_bball_optimal = kmeans(bball2, 2)
+fviz_cluster(clusters_bball_optimal, bball2)
+
+```
+
+Task 9:  Ther only patterns that are somewhat clear is that teams who do not score a lot of points are likely to give up a lot of points and teams who do score a lot of points are not giving up a lot of points.  Those groups are identified in clusters 3 and 2 respectively. 
+```{r}
+
+bball2 = bball2 %>% mutate(clusternum = clusters_bball$cluster)
+
+
+ggplot(bball2, aes(AdjOE, AdjDE, color = factor(clusternum))) +
+  geom_point()
+  
+
+
+
+```
+
+
+
+
+
+

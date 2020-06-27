@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1589724528333.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "69105A57",
+    "lastKnownWriteTime" : 7957688328213717356,
+    "last_content_update" : 1589724528333,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "40C4418D",
+        "caption" : "avg_cost",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=avg_cost&cache_key=40C4418D",
+        "displayedObservations" : "1817",
+        "environment" : "",
+        "expression" : "avg_cost",
+        "object" : "avg_cost",
+        "preview" : "0",
+        "totalObservations" : "1817",
+        "variables" : "2"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

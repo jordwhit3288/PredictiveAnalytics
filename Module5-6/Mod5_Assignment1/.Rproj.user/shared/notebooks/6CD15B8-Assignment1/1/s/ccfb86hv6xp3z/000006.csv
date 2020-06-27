@@ -1,0 +1,6 @@
+"0","set.seed(12345)"
+"0","train.rows = createDataPartition(y = fin$Class, p=0.7, list = FALSE)"
+"0","train = dplyr::slice(fin, train.rows)"
+"0","test = dplyr::slice(fin, -train.rows)"
+"0",""
+"0",""

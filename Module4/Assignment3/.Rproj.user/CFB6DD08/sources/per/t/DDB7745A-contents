@@ -1,0 +1,120 @@
+---
+title: "Assignment3"
+author: "Jordan Whitaker"
+date: "6/6/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+options(tidyverse.quiet = TRUE)
+library(tidyverse)
+library(caret)
+library(ranger)
+
+```
+
+
+
+```{r}
+blood = read_csv("Blood.csv")
+
+head(blood)
+
+blood = blood %>% mutate(DonatedMarch = as_factor(as.character(DonatedMarch))) %>%
+mutate(DonatedMarch = fct_recode(DonatedMarch,
+"Yes" = "1",
+"No" = "0"))
+
+summary(blood)
+str(blood)
+
+
+```
+
+```{r}
+set.seed(1234)
+train.rows = createDataPartition(y= blood$DonatedMarch, p=0.7, list= FALSE)
+
+train = blood[train.rows,]
+test = blood[-train.rows,]
+
+head(train)
+
+```
+
+```{r}
+summary(blood)
+blood[,-5]
+```
+
+
+
+```{r}
+fit_control = trainControl(method = "cv",
+                           number = 10) #10 fold cross validation
+
+set.seed(123)
+rf_fit = train(as.matrix(train[,-5]), y=as.matrix(train$DonatedMarch),
+               method = "ranger",
+               importance= "permutation",
+               trControl = fit_control,
+               num.trees = 100)
+
+
+
+```
+
+```{r}
+varImp(rf_fit)
+rf_fit
+```
+
+Task 3: The most important variable accoarding to varImp is TotalDonations while the least important is Mnths_Since_Last.
+
+```{r}
+predRF = predict(rf_fit, train)
+head(predRF)
+```
+
+```{r}
+
+confusionMatrix(predRF, train$DonatedMarch, positive="Yes")
+
+
+```
+
+Task 5: The accuracy of the random forest model when applied to the training dataset is strong at .8989 and the sensitivity and specificty are .60 and .9925 respectively. The specificty is high at .9925, which shows the true negative rate. Correctly classifying the people who are predicted to not donate blood in March.
+
+Task 6:  The model that I generated has an accuracy of .9027 while the naive model sits at an accuracy of .7615, this shows that the model would do much better than simply classifying everyone into the majority class.  The p-value shows that the model that I created is statistically significant when compared to the naive model.
+
+
+Predictions on Test
+```{r}
+
+predRF_test = predict(rf_fit, newdata = test)
+
+confusionMatrix(predRF_test, test$DonatedMarch, positive = "Yes")
+
+```
+
+Task 7: The model does not perform well on the testing dataset. The accuracy drops from 90% to 75%.  The model is also not significantly better than the naive model.
+
+Task 8:  This model would struggle when it is fed "real world" data and I would not recommend it to be used in real-world applications.  I would be concerned that it would misclassify people too often resulting in poor data driven decision making.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

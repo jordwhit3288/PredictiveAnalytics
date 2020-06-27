@@ -1,0 +1,2 @@
+"0",""
+"0","fviz_nbclust(bball2, kmeans, method =""silhouette"")"

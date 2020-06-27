@@ -1,0 +1,27 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592257331200.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "618593224",
+    "id" : "1AB49FBF",
+    "lastKnownWriteTime" : 1593272718,
+    "last_content_update" : 1593272718793,
+    "path" : "~/UNCW_Grad_Summer/BAN502/Course_Project/Phase1.Rmd",
+    "project_path" : "Phase1.Rmd",
+    "properties" : {
+        "cursorPosition" : "469,3",
+        "last_setup_crc32" : "F5269E14425f5510",
+        "scrollLine" : "431",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

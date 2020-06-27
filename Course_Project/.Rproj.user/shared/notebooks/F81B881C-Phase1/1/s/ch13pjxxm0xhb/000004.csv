@@ -1,0 +1,175 @@
+"0","nnetTuned = train(x=chi_new[,-2], y=chi_new$Arrest,
+                method = ""nnet"",
+                trControl = fitControl,
+                tuneGrid = nnetGrid,
+                verbose = FALSE,
+                trace = FALSE)
+"
+"2","model fit failed for Fold01: size=20, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold01: size=20, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold01: size=20, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold01: size=20, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold01: size=20, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold01: size=20, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold01: size=20, decay=1e-06 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=1e-06 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=1e-06 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=1e-06 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold01: size=20, decay=1e-07 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold01: size=21, decay=1e-07 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold01: size=22, decay=1e-07 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold01: size=23, decay=1e-07 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold02: size=20, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold02: size=21, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold02: size=22, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold02: size=23, decay=5e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold02: size=20, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold02: size=21, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold02: size=22, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold02: size=23, decay=1e-01 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold02: size=20, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold02: size=21, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold02: size=22, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold02: size=23, decay=1e-02 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold02: size=20, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold02: size=21, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold02: size=22, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold02: size=23, decay=1e-03 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold02: size=20, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold02: size=21, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold02: size=22, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold02: size=23, decay=1e-04 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"
+"2","model fit failed for Fold02: size=20, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1001) weights
+"
+"2","model fit failed for Fold02: size=21, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1051) weights
+"
+"2","model fit failed for Fold02: size=22, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1101) weights
+"
+"2","model fit failed for Fold02: size=23, decay=1e-05 Error in nnet.default(x, y, w, entropy = TRUE, ...) : 
+  too many (1151) weights
+"

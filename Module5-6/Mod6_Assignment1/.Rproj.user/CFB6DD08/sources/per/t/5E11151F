@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592747090538.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "5E11151F",
+    "lastKnownWriteTime" : 7954892377265827429,
+    "last_content_update" : 1592747090538,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "517F0087",
+        "caption" : "bball",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=bball&cache_key=517F0087",
+        "displayedObservations" : 353,
+        "environment" : "",
+        "expression" : "bball",
+        "object" : "bball",
+        "preview" : 0,
+        "totalObservations" : 353,
+        "variables" : 12
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

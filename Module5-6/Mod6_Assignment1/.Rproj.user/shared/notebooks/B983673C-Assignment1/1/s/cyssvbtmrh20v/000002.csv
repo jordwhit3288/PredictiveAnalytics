@@ -1,0 +1,18 @@
+"0","bball = read_csv(""kenpom20.csv"")
+"
+"2","Parsed with column specification:
+cols(
+  TeamName = [31mcol_character()[39m,
+  AdjTempo = [32mcol_double()[39m,
+  AdjOE = [32mcol_double()[39m,
+  AdjDE = [32mcol_double()[39m,
+  eFGPct = [32mcol_double()[39m,
+  TOPct = [32mcol_double()[39m,
+  ORPct = [32mcol_double()[39m,
+  FTRate = [32mcol_double()[39m,
+  eFGPctD = [32mcol_double()[39m,
+  TOPctD = [32mcol_double()[39m,
+  ORPctD = [32mcol_double()[39m,
+  FTRateD = [32mcol_double()[39m
+)
+"

@@ -1,0 +1,2 @@
+"0","set.seed(64)"
+"0","fviz_nbclust(trucks2, kmeans, method =""wss"")"

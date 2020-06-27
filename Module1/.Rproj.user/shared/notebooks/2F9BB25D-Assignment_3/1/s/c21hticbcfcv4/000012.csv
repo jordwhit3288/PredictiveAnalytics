@@ -1,0 +1,7 @@
+"0","avg_cost <- inventory %>%
+  group_by(`Item SKU`) %>%
+  
+avg_cost <-  summarize(avg_cost, SKUAvgCost = mean(`Cost per Unit ($)`))
+"
+"2","Error in mean(`Cost per Unit ($)`) : object 'Cost per Unit ($)' not found
+"
